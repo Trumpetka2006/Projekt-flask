@@ -1,0 +1,55 @@
+{% extends "core.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+        <h3 style="text-align: center;">Přihlášení</h3>
+        <form action="/login" method="POST" class="border" style="padding: 2rem;">
+            {% if valid %}
+                <div class="alert alert-danger">
+                    <strong>Chyba!</strong> Špatné jméno nebo heslo!
+                </div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="">Jméno</label>
+                <input class="form-control" type="text" name="username" id="">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="">Heslo</label>
+                <input class="form-control" type="password" name="password" id="">
+            </div>
+    
+            <div class="mb-3">
+                <input class="btn btn-primary" type="submit" value="Přihlásit se">
+            </div>
+        </form>
+        <h3 style="text-align: center;">Nebo</h3>
+        <form action="/login" method="POST" class="border" style="padding: 2rem;">
+            <div class="mb-3">
+                <label class="form-label" for="">Company UUID</label>
+                <input class="form-control" type="text" name="UUID" id="">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="">Check-Code</label>
+                <input class="form-control" type="password" name="CC" id="">
+            </div>
+            <div class="mb-3">
+                <input class="btn btn-primary" type="submit" value="Přihlásit se">
+            </div>
+        </form>
+        </div>
+        <div class="col-4"></div>
+    </div>
+
+</div>
+
+
+
+
+
+
+{% endblock %}

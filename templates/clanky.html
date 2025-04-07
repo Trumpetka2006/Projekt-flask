@@ -1,0 +1,16 @@
+{% extends "core.html" %}
+
+{% block content %}
+{% for x in articles -%}
+<div class="article">
+    <div class="row">
+        <h2>{{x.nadpis}}</h1>
+    </div>
+    <div class="row">
+        <div class="col-1">{{x.author}}</div>
+        <div class="row col-3">{{x.text}}</div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

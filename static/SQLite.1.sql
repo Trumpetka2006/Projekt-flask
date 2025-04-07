@@ -1,0 +1,1 @@
+INSERT INTO login VALUES (1, "Jiri", "0123")

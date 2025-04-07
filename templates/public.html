@@ -1,0 +1,16 @@
+{% extends "core.html" %}
+{% block page_title %}Veřejný archiv{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        {% for item in range(5) %}
+            <div class="row" style="margin: 2rem;">
+                <div class="card">
+                    <div class="card-header">/root/public_archvie/record#{{item}}</div>
+                    <div class="card-body"><img style="margin-right: 3rem; width: 6rem;" src="static/ico.png" alt=""> <a style="text-decoration: none;" class="display-6 text-dark" href="/record/{{item}}">Nový záznam</a></div>
+                    <div style="text-align: right;" class="card-foorer">admin 07.04.2025</div>
+                </div>
+            </div>
+        {% endfor %}
+{% endblock %}
