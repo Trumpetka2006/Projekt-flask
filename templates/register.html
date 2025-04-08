@@ -1,0 +1,37 @@
+{% extends "core.html" %}
+
+{% block page_title %}Registrace{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <h3 style="text-align: center;">Registrace</h3>
+            <form action="/signin" method="POST" class="border" style="padding: 2rem;">
+                <div class="mb-3">
+                    <label class="form-label" for="">Jméno</label>
+                    <input class="form-control" type="text" name="username" id="">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="">Heslo</label>
+                    <input class="form-control" type="password" name="password1" id="">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="">Potvrďte Heslo</label>
+                    <input class="form-control" type="password" name="password2" id="">
+                </div>
+        
+                <div class="mb-3">
+                    <input class="btn btn-primary" type="submit" value="Zaregistrovat se">
+                </div>
+            </form>
+        </div>
+        <div class="col-4"></div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

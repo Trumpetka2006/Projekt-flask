@@ -69,7 +69,7 @@ def register():
             return render_template("home.html")
 
 
-    return render_template("signin.html", title = "Registrace", error=error)
+    return render_template("register.html", title = "Registrace", error=error)
 
 
 

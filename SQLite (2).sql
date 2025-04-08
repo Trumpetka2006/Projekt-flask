@@ -1,0 +1,30 @@
+DROP TABLE public;
+DROP TABLE private;
+DROP TABLE users;
+
+CREATE TABLE IF NOT EXISTS public (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  img TEXT,
+  autor_id INTEGER KEY,
+  cration_date DATETIME NOT NULL);
+  
+CREATE TABLE IF NOT EXISTS private (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  img TEXT,
+  autor_id INTEGER KEY,
+  cration_date DATETIME NOT NULL);
+  
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  password TEXT NOT NULL,
+  UUID TEXT,
+  check_code TEXT,
+  is_employee BOOL NOT NULL,
+  registration_date DATETIME NOT NULL);
+  
