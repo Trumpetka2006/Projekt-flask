@@ -55,20 +55,24 @@ def register():
         username = request.form["username"]
         paswd1 = request.form["password1"]
         paswd2 = request.form["password2"]
-        f = open("uzivatel","r")
+        email = request.form["email"]
         if paswd1 != paswd2:
             error = 2
-        elif username in f.read():
-            error = 1
-        f.close()
-        if error == 0:
-            with open("uzivatel", "a") as file:
-                file.write(username)
-                file.write(";")
-                file.write(generate_password_hash(paswd1)+"\n")
-                file.close()
+        req = db.session.execute(text("SELECT users.name FROM users"))
+        users = req.fetchall()
+        for user in users:
+            if user[0] == username:
+                error = 1
 
-            session["uzivatel"] = username
+        if error == 0:
+            print(username)
+            print(generate_password_hash(paswd1))
+            pashash = generate_password_hash(paswd1)
+            db.session.execute(text(f"INSERT INTO users (name, email, password, is_employee, registration_date) VALUES ('{username}', '{email}', '{pashash}', 0, date())"))
+            db.session.commit()
+
+            session[USER] = username
+            session[PERMISSION] = False
             return render_template("home.html")
 
 
@@ -78,38 +82,31 @@ def register():
 
 @app.route("/logout")
 def logout():
-    del session[NAME]
+    del session[USER]
     del session[PERMISSION]
     return redirect("/")
 
 @app.route("/login",methods=["POST","GET"])
 def login():
-    session[USER] = "admin"
-    session[PERMISSION] = True
-    return redirect("/")
-    
     if request.method == "POST":
-        valid = 0
+        valid = False
         if request.method == "POST":
             name = request.form["username"]
             password = request.form["password"]
-            
-            with open("uzivatel","r") as file:
-                for record in file:
-                    seznam = record.split(";")
-                    encryptet = seznam[1].replace("\n","")
-                    if name == seznam[0] and check_password_hash(encryptet, password):
-                        session["uzivatel"] = name
-                        valid = 0
-                        break
-                    else:
-                        valid = 1
-        if valid:
-            return render_template("login.html", title = "Login", valid = valid)
-        else:
-            return render_template("index.html", title = "Home")
-    return render_template("login.html", title = "Login")
 
+            req = db.session.execute(text(f"SELECT users.password FROM users WHERE name == '{name}'"))
+            passhash = req.fetchall()
+            
+            if check_password_hash(passhash[0][0], password):
+                req = db.session.execute(text(f"SELECT users.is_employee FROM users WHERE name == '{name}'"))
+                data = req.fetchall()
+                session[USER] = name
+                session[PERMISSION] = data[0][0]
+                return redirect("/")
+            else:
+                return render_template("login.html", title = "Login", valid = True)
+    else:
+        return render_template("login.html")
 @app.route("/films")
 def films():
     sqlreq = db.session.execute(text('SELECT * FROM film'))
