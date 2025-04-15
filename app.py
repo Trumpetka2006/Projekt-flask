@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, session
+from flask import Flask, render_template, request, url_for, session, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
@@ -8,6 +8,9 @@ import os
 
 NAME = "name"
 ROUTE = "route"
+USER = "username"
+PERMISSION = "permission"
+
 app = Flask(__name__)
 
 # Konfigurace SQLite databáze
@@ -73,13 +76,18 @@ def register():
 
 
 
-@app.route("/loguot")
-def loguot():
-    del session["uzivatel"]
-    return render_template("status.html", title="Stav", tools=return_tools())
+@app.route("/logout")
+def logout():
+    del session[NAME]
+    del session[PERMISSION]
+    return redirect("/")
 
 @app.route("/login",methods=["POST","GET"])
 def login():
+    session[USER] = "admin"
+    session[PERMISSION] = True
+    return redirect("/")
+    
     if request.method == "POST":
         valid = 0
         if request.method == "POST":
@@ -142,53 +150,6 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/db_control")
-def control_panel():
-    return render_template("db_control.html", title="Ovádání databází", tools=return_tools())
-
-@app.route("/db_control/state")
-def db_state():
-    sqlreq = db.session.execute(text('SELECT * FROM film'))
-    actors = sqlreq.fetchall()
-
-    return render_template("db_control.html", title="Ovádání databází", tools=return_tools(), output=actors)
-
-@app.route("/db_control/film_actors")
-def actors():
-    sqlreq = db.session.execute(text("""
-                                        SELECT actor.actor_id, actor.first_name, actor.last_name FROM actor 
-                                        JOIN film_actor ON actor.actor_id = film_actor.actor_id 
-                                        JOIN film ON film_actor.film_id = film.film_id
-                                        GROUP BY actor.actor_id
-                                     """))
-    actors = sqlreq.fetchall()
-
-    sqlreq = db.session.execute(text("""
-                                        SELECT actor.actor_id, film.title FROM actor
-                                        JOIN film_actor ON actor.actor_id = film_actor.actor_id 
-                                        JOIN film ON film_actor.film_id = film.film_id
-                                    """))
-    films = sqlreq.fetchall()
-
-    result = []
-    for actor in actors:
-        cast = []
-        for film in films:
-            if actor[0] == film[0]:
-                cast.append(film[1])
-        result.append((f"{actor[1]} {actor[2]}", cast))
-
-    return render_template("db_control.html", title="Ovádání databází", tools=return_tools(), output=result)
-
-@app.route("/db_control/add_user",methods=["POST"])
-def add_user():
-    if request.method == "POST":
-        id = request.form["id"]
-        name = request.form["username"]
-        password = request.form["password"]
-
-    return render_template("db_control.html", title="Ovádání databází", tools=return_tools(), output=">")
-    
 
 @app.route("/gallery")
 def gallery():
@@ -211,42 +172,7 @@ def upload():
     #files.pop()
     return render_template("gallery.html", title="Galerie", tools=return_tools(), file=get_gallery(), state=state)
 
-@app.route("/clanky")
-def clanky():
-    clanky = vrat_clanky()
-    return render_template("clanky.html", articles=clanky, tools = return_tools(), title="Články")
 
-def vrat_clanky():
-    return [
-        {"nadpis": "První Článek","author":"Pavel", "text": "Toto je text članku."},
-        {"nadpis": "Druhy Článek","author":"Pavel", "text": "Toto je text članku."},
-        {"nadpis": "Třetí Článek","author":"Pavel", "text": "Toto je text članku."}
-    ]
-@app.route("/mocnina")
-def mocnina():
-    return render_template("vypocet.html", tools = return_tools(), title="Mocniny")
-
-@app.route("/vypocet", methods=["POST"])
-def vypocet():
-    try:
-        a = request.form["a"]
-        x = request.form["x"]
-        moc = int(a) ** int(x)
-    except:
-        return "kokote!"
-    return render_template("vypocet.html", data=moc, tools = return_tools(), title="Mocniny")
-
-
-""" @app.route("/mocnina/<int:a>/<int:b>")
-@app.route("/mocnina/<float:a>/<float:b>")
-def mocnina(a, b):
-    return f"{a} na {b} je {a**b}" """
-
-
-@app.route("/sqr/<int:a>")
-@app.route("/sqr/<float:a>")
-def sqroot(a):
-    return f"druhá odmocnina čisla {a} je {math.sqrt(a)}"
 
 
 if __name__ == "__main__":

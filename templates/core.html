@@ -20,20 +20,34 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('public_arch')}}">Veřejný archiv</a>
                 </li>
+                {% if session["permission"] %}
                 <li class="nav-item">
                   <a class="nav-link" href="#">Privátní archiv</a>
                 </li>
+                {% endif %}
+                {% if session["username"] %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('about')}}">Vytvořit záznam</a>
+                </li>
+                {% endif %}
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('about')}}">O nás</a>
                 </li>
+                
               </ul>
               <ul class="navbar-nav">
+                {% if session["username"] %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('logout')}}">Odhlásit se</a>
+                </li>
+                {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{url_for('login')}}">Přihlášení</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{url_for('register')}}">Registrace</a>
                 </li>
+                {% endif %}
                
               </ul>
             </div>
