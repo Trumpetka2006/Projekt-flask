@@ -35,7 +35,7 @@
                 </li>
                 
               </ul>
-              <h3 class="navbar-text m-3">{{session["username"]}}</h3>
+              <a class="navbar-text m-3" href="{{url_for('account')}}" >{{session["username"]}}</a>
               <ul class="navbar-nav">
                 {% if session["username"] %}
                 <li class="nav-item">

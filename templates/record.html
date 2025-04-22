@@ -14,9 +14,11 @@
         {{content[2]}} {{content[3]}}
     </div>
     {% if session %}
+    {% if session["username"] == content[2] or session["username"] == "admin" %}
     <div class="row">
         <a class="btn btn-danger" href="/del-record/{{content[4]}}">Smazat záznam</a>
     </div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

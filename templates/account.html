@@ -1,0 +1,21 @@
+{% extends "core.html" %}
+{% block page_title %}Detail záznamu{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1>{{info[0]}}</h1>
+        <label for="">Email: {{info[1]}}</label>
+        <label>Změnit heslo</label>
+        <form action="/account" method="POST">
+            <div class="mb-3">
+                <label><input class="form-control" type="password" name="old" id="" placeholder="Staré heslo" required></label><p></p>
+                <label><input class="form-control" type="password" name="new" id="" placeholder="Nové heslo" required></label><p></p>
+                <label><input class="form-control" type="password" name="again" id="" placeholder="Znovu heslo" required></label><p></p>
+                <input class="btn btn-primary" type="submit" value="Změnit heslo">
+            </div>
+            
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -90,27 +90,24 @@ def logout():
 @app.route("/login",methods=["POST","GET"])
 def login():
     if request.method == "POST":
-        valid = False
-        if request.method == "POST":
-            name = request.form["username"]
-            password = request.form["password"]
+        name = request.form["username"]
+        password = request.form["password"]
 
-            req = db.session.execute(text(f"SELECT users.password FROM users WHERE name == '{name}'"))
-            passhash = req.fetchall()
-            
-            try:
-                if check_password_hash(passhash[0][0], password):
-                    req = db.session.execute(text(f"SELECT users.is_employee FROM users WHERE name == '{name}'"))
-                    data = req.fetchall()
-                    session[USER] = name
-                    session[PERMISSION] = data[0][0]
-                    return redirect("/")
-                else:
-                    return render_template("login.html", title = "Login", valid = True)
-            except IndexError:
-                   return render_template("login.html", title = "Login", valid = False)
-    else:
-        return render_template("login.html")
+        req = db.session.execute(text(f"SELECT users.password FROM users WHERE name == '{name}'"))
+        passhash = req.fetchall()
+        
+        try:
+            if check_password_hash(passhash[0][0], password):
+                req = db.session.execute(text(f"SELECT users.is_employee FROM users WHERE name == '{name}'"))
+                data = req.fetchall()
+                session[USER] = name
+                session[PERMISSION] = data[0][0]
+                return redirect("/")
+            else:
+                return render_template("login.html", title = "Login", valid = True)
+        except IndexError:
+                return render_template("login.html", title = "Login", valid = False)
+    return render_template("login.html")
 
 @app.route("/add-record", methods = ["POST", "GET"])
 def add_record():
@@ -125,9 +122,7 @@ def add_record():
         db.session.execute(text(f"INSERT INTO {target} (title, content, autor_id, cration_date) VALUES ('{title}','{content}',{id},date())"))
         db.session.commit()
         return redirect("/public_archive")
-
-    else:
-        return render_template("add-record.html")
+    return render_template("add-record.html")
 
 @app.route("/del-record/<int:a>")
 def del_record(a):
@@ -136,31 +131,25 @@ def del_record(a):
         db.session.commit()
     return redirect("/public_archive")
 
-@app.route("/films")
-def films():
-    sqlreq = db.session.execute(text('SELECT * FROM film'))
-    movies = sqlreq.fetchall()
-
-    return render_template("films.html", title="Filmy", tools=return_tools(), movies=movies)
-
-@app.route("/films/add", methods = ['POST'])
-def add_film():
+@app.route("/account", methods = ['POST', 'GET'])
+def account():
     if request.method == "POST":
-        title = request.form.get('title')
-        desc = request.form.get("desc")
-        year = request.form.get('year')
+        old = request.form['old']
+        new = request.form['new']
+        again = request.form['again']
+        req = db.session.execute(text(f"SELECT password FROM users WHERE name == '{session[USER]}'"))
+        old_hash = req.fetchall()[0][0]
 
-        db.session.execute(text(f"INSERT INTO film(title, description, release_year, language_id, last_update) VALUES ('{title}', '{desc}', {year}, 1, datetime())"))
-        db.session.commit()
+        if check_password_hash(old_hash, old):
+            print("Staré heslo se shoduje")
+            if new == again:
+                print("Hesla se shodují")
+                db.session.execute(text(f"UPDATE users SET password = '{generate_password_hash(new)}' WHERE name = '{session[USER]}'"))
+                db.session.commit()
+                return redirect("/")
 
-        return films()
-
-@app.route("/films/pop")
-def pop_film():
-
-    db.session.execute(text('DELETE FROM film WHERE film_id = 1002'))
-    db.session.commit()
-    return films()
+    req = db.session.execute(text(f"SELECT name, email, registration_date FROM users WHERE name == '{session[USER]}'"))
+    return render_template("account.html", info = req.fetchall()[0])
 
 
 @app.route("/public_archive")
@@ -176,30 +165,6 @@ def record(a):
 @app.route("/about")
 def about():
     return render_template("about.html")
-
-
-
-@app.route("/gallery")
-def gallery():
-    files = os.listdir("static/gallery")
-    #files.pop()
-    return render_template("gallery.html", title="Galerie", tools=return_tools(), file=get_gallery(), state=-1)
-
-@app.route("/gallery/upload", methods=["POST"])
-def upload():
-
-    if request.method == "POST":
-        try:
-            f = request.files["soubor"]
-            f.save("static/gallery/"+f.filename)
-            state = 0
-        except:
-            state = 1
-
-    files = os.listdir("static/gallery")
-    #files.pop()
-    return render_template("gallery.html", title="Galerie", tools=return_tools(), file=get_gallery(), state=state)
-
 
 
 
