@@ -1,0 +1,33 @@
+{% extends "core.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form action="/add-record" method="POST">
+        <div class="mb-3">
+            <input class="form-control" type="text" name="title" id="title" placeholder="Název záznamu" required>
+        </div>
+        <div class="mb-3">
+            <textarea class="form-control" name="content" id="content" rows="10" placeholder="Záznam" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="">Přidat do</label>
+            <select class="form-select" name="target" id="">
+                <option value="public">Veřejný archiv</option>
+                <!-- <option value="private">Privátní archiv</option> -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <input type="submit" value="Přidat záznam">
+        </div>
+    </form>
+
+</div>
+
+
+
+
+
+
+{% endblock %}

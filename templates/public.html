@@ -4,12 +4,12 @@
 {% block content %}
 
     <div class="container">
-        {% for item in range(5) %}
+        {% for item in records %}
             <div class="row" style="margin: 2rem;">
                 <div class="card">
-                    <div class="card-header">/root/public_archvie/record#{{item}}</div>
-                    <div class="card-body"><img style="margin-right: 3rem; width: 6rem;" src="static/ico.png" alt=""> <a style="text-decoration: none;" class="display-6 text-dark" href="/record/{{item}}">Nový záznam</a></div>
-                    <div style="text-align: right;" class="card-foorer">admin 07.04.2025</div>
+                    <div class="card-header">/root/public_archvie/record#{{item[0]}}</div>
+                    <div class="card-body"><img style="margin-right: 3rem; width: 6rem;" src="static/ico.png" alt=""> <a style="text-decoration: none;" class="display-6 text-dark" href="/record/{{item[0]}}">{{item[1]}}</a></div>
+                    <div style="text-align: right;" class="card-foorer">{{item[2]}} {{item[3]}}</div>
                 </div>
             </div>
         {% endfor %}

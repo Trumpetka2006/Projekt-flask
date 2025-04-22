@@ -9,6 +9,7 @@ import os
 NAME = "name"
 ROUTE = "route"
 USER = "username"
+ID = "id"
 PERMISSION = "permission"
 
 app = Flask(__name__)
@@ -97,16 +98,44 @@ def login():
             req = db.session.execute(text(f"SELECT users.password FROM users WHERE name == '{name}'"))
             passhash = req.fetchall()
             
-            if check_password_hash(passhash[0][0], password):
-                req = db.session.execute(text(f"SELECT users.is_employee FROM users WHERE name == '{name}'"))
-                data = req.fetchall()
-                session[USER] = name
-                session[PERMISSION] = data[0][0]
-                return redirect("/")
-            else:
-                return render_template("login.html", title = "Login", valid = True)
+            try:
+                if check_password_hash(passhash[0][0], password):
+                    req = db.session.execute(text(f"SELECT users.is_employee FROM users WHERE name == '{name}'"))
+                    data = req.fetchall()
+                    session[USER] = name
+                    session[PERMISSION] = data[0][0]
+                    return redirect("/")
+                else:
+                    return render_template("login.html", title = "Login", valid = True)
+            except IndexError:
+                   return render_template("login.html", title = "Login", valid = False)
     else:
         return render_template("login.html")
+
+@app.route("/add-record", methods = ["POST", "GET"])
+def add_record():
+    if request.method == "POST":
+        title = request.form["title"]
+        content = request.form["content"]
+        target = request.form["target"]
+
+        req = db.session.execute(text(f"SELECT users.id FROM users WHERE name == '{session[USER]}'"))
+        id = req.fetchall()[0][0]
+        
+        db.session.execute(text(f"INSERT INTO {target} (title, content, autor_id, cration_date) VALUES ('{title}','{content}',{id},date())"))
+        db.session.commit()
+        return redirect("/public_archive")
+
+    else:
+        return render_template("add-record.html")
+
+@app.route("/del-record/<int:a>")
+def del_record(a):
+    if session[USER] == "admin":
+        db.session.execute(text(f"DELETE FROM public WHERE id = {a}"))
+        db.session.commit()
+    return redirect("/public_archive")
+
 @app.route("/films")
 def films():
     sqlreq = db.session.execute(text('SELECT * FROM film'))
@@ -136,11 +165,13 @@ def pop_film():
 
 @app.route("/public_archive")
 def public_arch():
-    return render_template("public.html")
+    req = db.session.execute(text("SELECT public.id, public.title, users.name, public.cration_date FROM public JOIN users on public.autor_id = users.id ORDER BY public.id DESC"))
+    return render_template("public.html", records = req.fetchall())
 
 @app.route("/record/<int:a>")
 def record(a):
-    return render_template("record.html")
+    req = db.session.execute(text(f"SELECT public.title, public.content , users.name, public.cration_date, public.id FROM public JOIN users on public.autor_id = users.id WHERE public.id = {a}"))
+    return render_template("record.html", content=req.fetchall()[0])
 
 @app.route("/about")
 def about():
